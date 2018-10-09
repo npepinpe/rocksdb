@@ -2050,6 +2050,29 @@ class DirectSliceJni : public NativeRocksMutableObject<
 
     return jdirect_slice;
   }
+
+  static jobject construct1(JNIEnv* env, const Slice& slice) {
+    jobject jdirect_slice = construct0(env);
+    if (jdirect_slice == nullptr) {
+      // exception occurred constructing object
+      return nullptr;
+    }
+
+
+    bool pending_exception = setHandle(env, jdirect_slice, &slice, JNI_FALSE);
+    if(pending_exception) {
+      // exception occurred in setHandle or descendant
+      if(env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+      }
+
+      env->DeleteLocalRef(jdirect_slice);
+      return nullptr;
+    }
+
+    printf("Constructed a DirectSlice wrapping a slice at address %p of size %zd\n", &slice, slice.size());
+    return jdirect_slice;
+  }
 };
 
 // The portal class for java.util.List

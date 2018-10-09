@@ -5,6 +5,8 @@
 
 package org.rocksdb;
 
+import java.nio.ByteBuffer;
+
 /**
  * <p>An iterator that yields a sequence of key/value pairs from a source.
  * Multiple implementations are provided by this library.
@@ -50,6 +52,16 @@ public class RocksIterator extends AbstractRocksIterator<RocksDB> {
     return value0(nativeHandle_);
   }
 
+  public ByteBuffer keyBuffer() {
+    assert(isOwningHandle());
+    return keyBuffer0(nativeHandle_);
+  }
+
+  public ByteBuffer valueBuffer() {
+    assert(isOwningHandle());
+    return valueBuffer0(nativeHandle_);
+  }
+
   @Override protected final native void disposeInternal(final long handle);
   @Override final native boolean isValid0(long handle);
   @Override final native void seekToFirst0(long handle);
@@ -62,4 +74,6 @@ public class RocksIterator extends AbstractRocksIterator<RocksDB> {
 
   private native byte[] key0(long handle);
   private native byte[] value0(long handle);
+  private native ByteBuffer keyBuffer0(long handle);
+  private native ByteBuffer valueBuffer0(long handle);
 }

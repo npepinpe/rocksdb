@@ -184,3 +184,29 @@ jbyteArray Java_org_rocksdb_RocksIterator_value0(JNIEnv* env, jobject /*jobj*/,
       const_cast<jbyte*>(reinterpret_cast<const jbyte*>(value_slice.data())));
   return jkeyValue;
 }
+
+/*
+ * Class:     org_rocksdb_RocksIterator
+ * Method:    keyBuffer0
+ * Signature: (J)Ljava/lang/Object;
+ */
+jobject Java_org_rocksdb_RocksIterator_keyBuffer0(JNIEnv* env, jobject /*jobj*/,
+                                               jlong handle) {
+  auto* it = reinterpret_cast<rocksdb::Iterator*>(handle);
+  rocksdb::Slice slice = it->key();
+  return env->NewDirectByteBuffer(const_cast<char*>(slice.data()),
+                                    slice.size());
+}
+
+/*
+ * Class:     org_rocksdb_RocksIterator
+ * Method:    valueBuffer0
+ * Signature: (J)Ljava/lang/Object;
+ */
+jobject Java_org_rocksdb_RocksIterator_valueBuffer0(JNIEnv* env, jobject /*jobj*/,
+                                                 jlong handle) {
+  auto* it = reinterpret_cast<rocksdb::Iterator*>(handle);
+  rocksdb::Slice slice = it->value();
+  return env->NewDirectByteBuffer(const_cast<char*>(slice.data()),
+                                    slice.size());
+}

@@ -9,6 +9,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
+import java.nio.ByteBuffer;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RocksIteratorTest {
@@ -94,6 +96,30 @@ public class RocksIteratorTest {
         iterator.seekForPrev("key3".getBytes());
         assertThat(iterator.isValid()).isTrue();
         assertThat(iterator.key()).isEqualTo("key2".getBytes());
+      }
+    }
+  }
+
+  @Test
+  public void keyAndValueSlice() throws RocksDBException {
+    try (final Options options = new Options()
+            .setCreateIfMissing(true)
+            .setCreateMissingColumnFamilies(true);
+         final RocksDB db = RocksDB.open(options,
+                 dbFolder.getRoot().getAbsolutePath())) {
+      db.put("key1".getBytes(), "value1".getBytes());
+      db.put("key2".getBytes(), "value2".getBytes());
+
+      try (final RocksIterator iterator = db.newIterator()) {
+        iterator.seekToFirst();
+        assertThat(iterator.isValid());
+        assertThat(iterator.keyBuffer()).isEqualTo(ByteBuffer.wrap("key1".getBytes()));
+        assertThat(iterator.valueBuffer()).isEqualTo(ByteBuffer.wrap("value1".getBytes()));
+
+        iterator.next();
+        assertThat(iterator.isValid());
+        assertThat(iterator.keyBuffer()).isEqualTo(ByteBuffer.wrap("key2".getBytes()));
+        assertThat(iterator.valueBuffer()).isEqualTo(ByteBuffer.wrap("value2".getBytes()));
       }
     }
   }
